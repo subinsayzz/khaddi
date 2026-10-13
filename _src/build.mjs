@@ -109,7 +109,6 @@ const strip = `
   </section>`;
 
 /* ───────── HOME ───────── */
-const words = (t, start) => t.split(' ').map((w, i) => `<span class="w" style="--i:${start + i}"><span>${w}</span></span>`).join(' ');
 const tile = (p, n = 0) => `
       <a class="tile reveal" style="--d:${(n % 4) * 0.12}s" href="product.html">
         <div class="plate sq"><img src="${P}${p.img[0]}.jpg" alt="${p.name}, ${p.kind.toLowerCase()}" loading="lazy"></div>
@@ -127,13 +126,13 @@ page('index.html', 'KHADDI PASHMINA — Basohli, Jammu', 'Pashmina spun and wove
   <section class="hero full bleed">
     <img src="${I}hero-poster.jpg" alt="A lake on the high plateau of Ladakh">
     <video autoplay muted loop playsinline preload="metadata" poster="${I}hero-poster.jpg" aria-hidden="true"><source src="assets/video/hero.mp4" type="video/mp4"></video>
-    <div class="caption v2">
+    <div class="hero-center">
+      <h1 class="hero-title" aria-label="Warmth without weight"><span style="--i:0">Warmth</span> <em style="--i:1">without</em> <span style="--i:2">weight</span></h1>
+      <p class="hero-by"><span>Entirely by hand</span></p>
+    </div>
+    <div class="caption">
       <p class="label">Khadi-Pashmina · Basohli, Jammu</p>
-      <h1 class="hero-title" aria-label="Warmth without weight. Entirely by hand."><span class="ln">${words('Warmth without weight.', 0)}</span><em class="ln">${words('Entirely by hand.', 3)}</em></h1>
-      <div class="hero-foot">
-        <p class="hero-sub">Pashmina spun and woven by hand in one town, about forty pieces a month.</p>
-        <a class="more" href="shop.html">Discover the pieces</a>
-      </div>
+      <a class="more" href="shop.html">Discover the pieces</a>
     </div>
   </section>
 
