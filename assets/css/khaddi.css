@@ -671,3 +671,28 @@ table.t td:last-child,table.t th:last-child{text-align:right;padding-right:0}
   .s-left,.s-right{justify-self:start;padding-bottom:0;width:100%;max-width:none}
   .framed{width:min(84%,380px);order:-1}
 }
+
+/* ───────── hero heading: a two-line statement across the full width, words rising into place ───────── */
+.hero.full::after{background:linear-gradient(180deg,rgba(22,20,16,.46) 0%,rgba(22,20,16,.06) 22%,rgba(22,20,16,0) 38%,rgba(22,20,16,.4) 62%,rgba(22,20,16,.82) 100%)}
+.hero .caption.v2{display:block}
+.caption.v2 .label{text-shadow:0 1px 14px rgba(12,10,8,.55)}
+.hero-title{font-family:var(--display);font-weight:300;font-size:clamp(46px,7.9vw,132px);line-height:1;letter-spacing:-.018em;margin:clamp(12px,1.4vw,20px) 0 clamp(20px,2.4vw,36px);text-shadow:0 2px 44px rgba(12,10,8,.4)}
+.hero-title .ln{display:block}
+.hero-title em.ln{font-style:italic;text-align:right}
+.hero-title .w{display:inline-block;overflow:hidden;vertical-align:top;padding:.1em .1em .16em;margin:-.1em -.1em -.16em}
+.hero-title .w > span{display:inline-block}
+.hero-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:20px 40px;flex-wrap:wrap;padding-top:clamp(14px,1.5vw,22px);border-top:1px solid rgba(251,248,241,.42)}
+.hero-sub{font-size:clamp(16px,1.25vw,19px);line-height:1.5;max-width:40ch;opacity:.92;text-shadow:0 1px 14px rgba(12,10,8,.55)}
+.hero .caption.v2 .more{margin:0 0 4px auto;text-shadow:0 1px 14px rgba(12,10,8,.55)}
+@media (prefers-reduced-motion:no-preference){
+  .hero-title .w > span{transform:translateY(118%);animation:word-up 1.25s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(.45s + var(--i) * .11s)}
+  @keyframes word-up{to{transform:none}}
+  .caption.v2 .label,.hero-foot{opacity:0;animation:hero-in 1.4s ease forwards}
+  .caption.v2 .label{animation-delay:.25s}
+  .hero-foot{animation-delay:1.35s;transform-origin:left}
+  @keyframes hero-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+}
+@media (max-width:820px){
+  .hero-title{font-size:clamp(44px,12.6vw,72px);line-height:1.02}
+  .hero-title em.ln{text-align:left}
+}
