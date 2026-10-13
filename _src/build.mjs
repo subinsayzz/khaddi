@@ -1,6 +1,6 @@
-// Generates the static KHADDI mock-up pages into the project root.
+// Generates the static KHADDI PASHMINA store mock-up pages into the project root.
 // Run: node _src/build.mjs   (output is plain HTML + CSS, no runtime JS)
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,90 +9,65 @@ const P = 'assets/img/products/';
 const C = 'assets/img/craft/';
 const I = 'assets/img/';
 
-/* ───────── icons ───────── */
-const mark = (s = 44, sw = 5.5) => `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" aria-hidden="true"><path d="M24 4v13M24 31v13M4 24h40"/></svg>`;
-const heart = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>`;
-const bag = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>`;
-const menu = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg>`;
-const play = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
+// Outlined logo (KHADDI over PASHMINA), drawn once into assets/logo/logo.json.
+const L = JSON.parse(readFileSync(join(ROOT, 'assets/logo/logo.json'), 'utf8'));
+const logo = `<svg viewBox="${L.viewBox}" role="img" aria-label="KHADDI PASHMINA"><path d="${L.d}"/></svg>`;
 
 /* ───────── sample data (placeholder names, prices and numbers) ───────── */
-const SW = { undyed: '#efe6d2', grey: '#b8aea0', taupe: '#8c7b6b', madder: '#a72f24', saffron: '#d99331', lapis: '#1c3f94', rose: '#c2477e' };
 const products = [
-  { id: 'ravi', name: 'The Ravi Stole', type: 'Stole · plain weave', price: 260, pill: 'Hand-spun', img: ['ravi-1', 'ravi-2'], sw: ['grey', 'undyed', 'taupe'], by: 'Shabnam Devi', ini: 'SD', days: 9, stock: '4 of 41 left' },
-  { id: 'billawar', name: 'The Billawar Stole', type: 'Stole · madder root', price: 340, pill: 'Natural dye', img: ['billawar-1', 'billawar-2'], sw: ['madder', 'undyed'], by: 'Kamlesh Kumari', ini: 'KK', days: 11, stock: '2 of 41 left' },
-  { id: 'nama', name: 'The Nāma Shawl', type: 'Shawl · your name, hand-embroidered', price: 480, pill: 'Nāma', pillClass: 'madder', img: ['nama-1', 'nama-2'], sw: ['rose', 'lapis', 'saffron'], by: 'Rekha Devi', ini: 'RD', days: 15, stock: 'Order by 25 Nov' },
-  { id: 'sarthal', name: 'The Sarthal Shawl', type: 'Shawl · hand-knotted tassels', price: 390, pill: 'Hand-spun', img: ['sarthal-1', 'sarthal-2'], sw: ['undyed', 'grey'], by: 'Sunita Devi', ini: 'SD', days: 13 },
-  { id: 'purthu', name: 'The Purthu Check', type: 'Shawl · open check', price: 320, pill: 'Hand-spun', img: ['purthu-1', 'purthu-2'], sw: ['undyed', 'saffron', 'taupe'], by: 'Pushpa Devi', ini: 'PD', days: 12 },
-  { id: 'bani', name: 'The Bani Stripe', type: 'Stole · two-tone stripe', price: 290, pill: 'Hand-spun', img: ['bani-1', 'bani-2'], sw: ['taupe', 'undyed'], by: 'Shabnam Devi', ini: 'SD', days: 10 },
-  { id: 'mahanpur', name: 'The Mahanpur Shawl', type: 'Shawl · embroidered buti', price: 520, pill: 'Nāma', pillClass: 'madder', img: ['mahanpur-1', 'mahanpur-2'], sw: ['undyed', 'saffron'], by: 'Rekha Devi', ini: 'RD', days: 17 },
-  { id: 'kesar', name: 'The Kesar Band', type: 'Shawl · saffron band', price: 300, pill: 'Natural dye', img: ['kesar-1', 'kesar-2'], sw: ['saffron', 'undyed'], by: 'Kamlesh Kumari', ini: 'KK', days: 11 },
-  { id: 'sewa', name: 'The Sewa Check', type: 'Shawl · madder windowpane', price: 330, pill: 'Natural dye', img: ['sewa-1', 'sewa-2'], sw: ['madder', 'taupe'], by: 'Pushpa Devi', ini: 'PD', days: 12 },
-  { id: 'dhar', name: 'The Dhar Stole', type: 'Stole · madder motif', price: 450, pill: 'Nāma', pillClass: 'madder', img: ['dhar-1', 'detail-bird'], sw: ['madder', 'undyed'], by: 'Rekha Devi', ini: 'RD', days: 14 },
-  { id: 'ujh', name: 'The Ujh Muffler', type: 'Muffler · grey check', price: 220, pill: 'Waiting list', pillClass: 'undyed', img: ['ujh-1', 'ujh-2'], sw: ['grey', 'undyed'], by: 'Sunita Devi', ini: 'SD', days: 7, stock: 'Next drop 1 Nov' },
-  { id: 'chanchlo', name: 'The Chanchlo Shawl', type: 'Shawl · indigo motif', price: 540, pill: 'Nāma', pillClass: 'madder', img: ['chanchlo-1', 'shawl-dark'], sw: ['lapis', 'grey'], by: 'Rekha Devi', ini: 'RD', days: 18 },
+  { id: 'ravi', name: 'Ravi', kind: 'Stole', price: 260, img: ['ravi-1', 'ravi-2'], by: 'Shabnam Devi', stock: 'Four left' },
+  { id: 'billawar', name: 'Billawar', kind: 'Stole, madder root', price: 340, img: ['billawar-2', 'billawar-1'], by: 'Kamlesh Kumari', stock: 'Two left' },
+  { id: 'nama', name: 'Nama', kind: 'Shawl, embroidered', price: 480, img: ['nama-1', 'nama-2'], by: 'Rekha Devi' },
+  { id: 'sarthal', name: 'Sarthal', kind: 'Shawl', price: 390, img: ['sarthal-1', 'sarthal-2'], by: 'Sunita Devi' },
+  { id: 'purthu', name: 'Purthu', kind: 'Shawl', price: 320, img: ['purthu-1', 'purthu-2'], by: 'Pushpa Devi' },
+  { id: 'kesar', name: 'Kesar', kind: 'Shawl', price: 300, img: ['kesar-1', 'kesar-2'], by: 'Kamlesh Kumari' },
+  { id: 'bani', name: 'Bani', kind: 'Stole', price: 290, img: ['bani-1', 'bani-2'], by: 'Shabnam Devi' },
+  { id: 'mahanpur', name: 'Mahanpur', kind: 'Shawl, embroidered', price: 520, img: ['mahanpur-1', 'mahanpur-2'], by: 'Rekha Devi' },
+  { id: 'sewa', name: 'Sewa', kind: 'Shawl', price: 330, img: ['sewa-1', 'sewa-2'], by: 'Pushpa Devi' },
+  { id: 'dhar', name: 'Dhar', kind: 'Stole, embroidered', price: 450, img: ['dhar-1', 'detail-bird'], by: 'Rekha Devi', stock: 'One left' },
+  { id: 'ujh', name: 'Ujh', kind: 'Muffler', price: 220, img: ['ujh-2', 'ujh-1'], by: 'Sunita Devi', sold: true },
+  { id: 'chanchlo', name: 'Chanchlo', kind: 'Shawl, embroidered', price: 540, img: ['chanchlo-1', 'shawl-dark'], by: 'Rekha Devi' },
 ];
 const byId = Object.fromEntries(products.map(p => [p.id, p]));
 
-const card = (p, lg = false) => `
-      <a class="card${lg ? ' lg' : ''}" href="product.html">
-        <div class="card-media">
-          <span class="pill ${p.pillClass || ''}">${p.pill}</span>
-          <img src="${P}${p.img[0]}.jpg" alt="${p.name}, ${p.type}" loading="lazy">
-          <img class="alt" src="${P}${p.img[1]}.jpg" alt="" loading="lazy">
-          <div class="card-tools">
-            ${p.sw.map((s, i) => `<span class="sw${i ? '' : ' on'}" style="background:${SW[s]}" title="${s}"></span>`).join('')}
-            ${p.stock ? `<span class="stock">${p.stock}</span>` : '<span class="sp"></span>'}
-            <span class="heart">${heart}</span>
-          </div>
-        </div>
-        <div class="card-info">
-          <h3>${p.name}</h3><span class="price">€${p.price}</span>
-          <span class="by"><span class="avatar">${p.ini}</span>Spun by ${p.by} · ${p.days} days</span>
-        </div>
+const piece = p => `
+      <a class="piece rise" href="product.html">
+        <div class="plate"><img src="${P}${p.img[0]}.jpg" alt="${p.name}, ${p.kind.toLowerCase()}" loading="lazy"><img src="${P}${p.img[1]}.jpg" alt="" loading="lazy"></div>
+        <div class="meta"><span>${p.name}</span><span>€${p.price}</span></div>
+        <p class="by">${p.kind}${p.sold ? ' · waiting list' : ''}</p>
       </a>`;
+const fig = (src, shape, alt, cap) => `<figure class="rise"><div class="plate ${shape}"><img src="${src}" alt="${alt}" loading="lazy"></div>${cap ? `<figcaption><i>${cap[0]}</i>${cap[1]}</figcaption>` : ''}</figure>`;
 
 /* ───────── shared chrome ───────── */
-const NAV = [['shop.html', 'Shop'], ['nama.html', 'Nāma'], ['story.html', 'The Story'], ['makers.html', 'The Makers']];
+const LEFT = [['shop.html', 'Shop'], ['nama.html', 'Nama'], ['story.html', 'Story']];
+const RIGHT = [['#', 'Search'], ['bag.html', 'Bag (2)']];
+const MORE = [['makers.html', 'The makers'], ['passport.html', 'Thread Passport'], ['contact.html', 'Contact']];
+const link = active => ([h, t]) => `<a href="${h}"${active === h ? ' class="is-active"' : ''}>${t}</a>`;
 const header = active => `
 <header class="site-header">
-  <nav class="nav" aria-label="Primary">
-    ${NAV.map(([h, t]) => `<a href="${h}"${active === h ? ' class="is-active"' : ''}>${t}</a>`).join('\n    ')}
-  </nav>
-  <a class="wordmark" href="index.html" aria-label="KHADDI home">KHADDI</a>
-  <nav class="nav nav-right" aria-label="Account">
-    <a href="passport.html"${active === 'passport.html' ? ' class="is-active"' : ''}>Thread Passport</a>
-    <a href="#">EUR € · DDP</a>
-    <a href="#">Cart (0)</a>
-    <a href="contact.html"${active === 'contact.html' ? ' class="is-active"' : ''}>Contact</a>
-  </nav>
-  <div class="m-actions">
-    <details>
-      <summary aria-label="Menu">${menu}</summary>
-      <div class="m-menu">
-        ${NAV.map(([h, t]) => `<a href="${h}">${t}</a>`).join('')}<a href="passport.html">Thread Passport</a><a href="contact.html">Contact</a>
-      </div>
-    </details>
-    <a href="#" aria-label="Cart">${bag}</a>
-  </div>
+  <nav class="nav" aria-label="Primary">${LEFT.map(link(active)).join('')}</nav>
+  <details class="m-menu"><summary class="label" aria-label="Menu">Menu</summary><div class="sheet">${[...LEFT, ...MORE].map(([h, t]) => `<a href="${h}">${t}</a>`).join('')}</div></details>
+  <a class="logo" href="index.html" aria-label="KHADDI PASHMINA — home">${logo}</a>
+  <nav class="nav right" aria-label="Secondary">${RIGHT.map(link(active)).join('')}</nav>
+  <a class="bag" href="bag.html">Bag (2)</a>
 </header>`;
 
 const footer = `
 <footer class="site-footer">
-  <img class="bg" src="${I}footer-valley.jpg" alt="" loading="lazy">
-  <div class="foot-panel">
-    <div><h4>Store</h4><ul><li><a href="shop.html">Shop</a></li><li><a href="nama.html">Nāma — personalise</a></li><li><a href="story.html">The Story</a></li><li><a href="makers.html">The Makers</a></li></ul></div>
-    <div><h4>Support</h4><ul><li><a href="#">Shipping, duty &amp; VAT (DDP)</a></li><li><a href="#">Returns &amp; withdrawal</a></li><li><a href="#">Care, repair &amp; re-embroidery</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
-    <div><h4>The Trust</h4><ul><li><a href="#">discoveringroots.org</a></li><li><a href="makers.html">Published pay rates</a></li><li><a href="#">Impact numbers</a></li><li><a href="#">Press</a></li></ul></div>
-    <div><h4>Letters from Basohli</h4><p>One letter a week from the village. What happened, what went wrong, what is on the looms.</p><form class="form" style="margin:0"><input class="field" type="email" placeholder="you@example.com" aria-label="Email"><button class="btn btn-lapis" type="button">Follow it from the beginning</button></form></div>
+  <img src="${I}footer-valley.jpg" alt="" loading="lazy">
+  <div class="foot">
+    <div><h4>Store</h4><ul><li><a href="shop.html">Shop</a></li><li><a href="nama.html">Nama — personalise</a></li><li><a href="story.html">The story</a></li><li><a href="makers.html">The makers</a></li></ul></div>
+    <div><h4>Support</h4><ul><li><a href="#">Shipping, duty &amp; VAT</a></li><li><a href="#">Returns &amp; withdrawal</a></li><li><a href="#">Care, repair &amp; re-embroidery</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+    <div><h4>The trust</h4><ul><li><a href="#">discoveringroots.org</a></li><li><a href="makers.html">Published pay rates</a></li><li><a href="passport.html">Thread Passport</a></li><li><a href="#">Press</a></li></ul></div>
+    <div><h4>Letters from Basohli</h4><p>One letter a week from the village. What happened, what went wrong, what is on the looms.</p><form class="form"><input class="field" type="email" placeholder="you@example.com" aria-label="Email"><button class="btn solid" type="button">Follow it from the beginning</button></form></div>
   </div>
   <div class="foot-mark">
-    <div class="bigmark">KHADDI</div>
-    <div class="deva">खड्डी</div>
-    <div class="desc">Khadi-Pashmina · Basohli, Jammu</div>
-    <div class="date">Craft of the 17th century. Revived 2016.</div>
+    <a class="logo" href="index.html" aria-label="KHADDI PASHMINA">${logo}</a>
+    <p class="deva">खड्डी</p>
+    <p class="label">Khadi-Pashmina · Basohli, Jammu</p>
+    <p class="date">Craft of the 17th century. Revived 2016.</p>
   </div>
-  <div class="foot-legal"><span>KHADDI — by the Discovering Roots Trust · Basohli, Jammu &amp; Kashmir</span><span>Composition: 100% cashmere · Privacy · Terms · Cookies</span></div>
+  <div class="colophon"><span>KHADDI — by the Discovering Roots Trust · Basohli, Jammu</span><span>Composition: 100% cashmere · Privacy · Terms · Cookies</span></div>
 </footer>`;
 
 const page = (file, title, desc, body, { home = false } = {}) => writeFileSync(join(ROOT, file), `<!DOCTYPE html>
@@ -102,466 +77,407 @@ const page = (file, title, desc, body, { home = false } = {}) => writeFileSync(j
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title}</title>
 <meta name="description" content="${desc}">
+<link rel="icon" href="assets/logo/khaddi-pashmina.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Karla:ital,wght@0,300;0,400;0,700;1,400&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Tiro+Devanagari+Hindi&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/khaddi.css">
+<script>document.documentElement.classList.add('js')</script>
 </head>
 <body${home ? ' class="home"' : ''}>
 ${header(file)}
-<main${home ? '' : ' class="inner"'}>
+<main>
 ${body}
 </main>
 ${footer}
+<script src="assets/js/reveal.js" defer></script>
 </body>
 </html>
 `);
 
-/* ───────── reusable sections ───────── */
-const tick = items => `<div class="ticker" aria-hidden="true"><div class="ticker-track">${[...items, ...items].map(t => `<span>${t}</span>`).join('')}</div></div>`;
+const stitch = `<div class="stitch"><div class="latin">For Clara · 12.12.26</div><div class="dv">क्लारा के लिए</div></div>`;
 
-const film = `
-  <section class="film">
-    <img class="bg" src="${I}bts-charkha.jpg" alt="A spinner at a wooden charkha" loading="lazy">
-    <div class="top"><p class="label">From the hub in Basohli</p><h2>Nine days to spin. Six to weave.</h2></div>
-    <div class="bottom">${mark(52, 4.5)}<p>A power loom does this in five minutes. Ours took fifteen days and four people, and every one of them is named on the piece.</p></div>
-    <a class="play" href="#" aria-label="Play the three-minute film">${play}</a>
-  </section>`;
-
-const REELS = [['craft/dehairing', 'Dehairing by hand. No narration.', '01'], ['products/detail-tassel', 'Why your €40 pashmina is a lie', '02'], ['craft/charkha', 'Nine days to spin one shawl', '05'], ['craft/weaver', 'Six days on loom no. 4', '06'], ['products/nama-2', 'Embroidering a stranger’s name', '08'], ['craft/embroidery', 'Twelve women, one room', '06'], ['products/worn-1', 'The first shawls leave for Europe', '11'], ['craft/basohli-palace', 'The town that forgot its own cloth', '01']];
-const diaries = `
-  <section class="section" style="padding-bottom:0">
-    <div class="diaries">
-      <div class="side">
-        <span class="at">@discoveringroots + you</span>
-        <h2>Watch it being made<b>The Basohli Diaries</b></h2>
-        <p>A town that had forgotten how to make its own cloth.<br>Hands that remember what books cannot teach.<br>One episode every two weeks, from the village. Nothing is sold on the channel.</p>
-      </div>
-      <div class="reel-view"><div class="reel-track">${[...REELS, ...REELS].map(([src, t, n]) => `<a class="reel" href="#"><img src="${I}${src}.jpg" alt="" loading="lazy"><span class="h">@discoveringroots</span><span class="n">EP ${n}</span><span class="t">${t}</span></a>`).join('')}</div></div>
+const STRIP = [['craft/goats', 'I', 'The fibre'], ['craft/carding', 'II', 'Carding'], ['craft/charkha', 'III', 'Spinning'], ['craft/loom', 'IV', 'The loom'], ['craft/weaver', 'V', 'Weaving'], ['craft/embroidery', 'VI', 'Embroidery'], ['products/detail-tassel', 'VII', 'The finish'], ['products/worn-1', 'VIII', 'Worn']];
+const strip = `
+  <section class="strip bleed gap">
+    <div class="side">
+      <p class="label soft">From goat to cloth</p>
+      <h2 class="title">Fifteen days, four pairs of hands.</h2>
+      <a class="more" href="makers.html">Meet the makers</a>
     </div>
-  </section>`;
-
-const phone = `
-      <div class="phone"><div class="phone-screen">
-        <div class="pp-head"><span>Thread Passport</span><span>No. 0187 / 2026</span></div>
-        <div class="pp-face"><img src="${C}charkha.jpg" alt="The spinner at her charkha"><div class="cap">Spun by<b>Shabnam Devi</b>9 days · Basohli</div></div>
-        <ul class="pp-list">
-          <li><span>Woven</span><span>Bishan Dass · 6 days · loom no. 4</span></li>
-          <li><span>Embroidered</span><span>Rekha Devi</span></li>
-          <li><span>Fibre</span><span>Changthangi, Ladakh · 13.2µ</span></li>
-          <li><span>Dye</span><span>Undyed</span></li>
-          <li><span>Film</span><span>40 seconds on the loom ▸</span></li>
-        </ul>
-        <div class="pp-cta">Book care, repair or re-embroidery</div>
-      </div></div>`;
-
-const passportBlock = `
-  <section class="section" style="padding-bottom:0">
-    <div class="passport">
-      <div>
-        <span class="eyebrow">The Thread Passport</span>
-        <h2>Tap the hem. Meet the person who made it.</h2>
-        <p>Every piece carries a small NFC tag stitched into the hem, with a printed QR beside it. Hold a phone to it and a page opens. No app.</p>
-        <ol><li>The piece number, against this year’s total.</li><li>Who spun it, who wove it, who embroidered it — and for how many days.</li><li>The fibre, its micron count and the lab batch.</li><li>Forty seconds of your piece on the loom.</li></ol>
-        <a class="btn" href="passport.html">See a passport</a>
-      </div>
-      ${phone}
-    </div>
+    <div class="track">${STRIP.map(([src, n, t]) => `<a class="tall" href="makers.html"><img src="${I}${src}.jpg" alt="${t}" loading="lazy"><span><i>${n}</i>${t}</span></a>`).join('')}</div>
   </section>`;
 
 /* ───────── HOME ───────── */
-page('index.html', 'KHADDI — Khadi-Pashmina · Basohli, Jammu', 'Hand-spun, hand-woven cashmere from Basohli, Jammu. Every piece names the people who made it.', `
-  <section class="hero">
-    <img class="bg" src="${I}hero-loom.jpg" alt="A shuttle resting on a wooden handloom">
-    <div class="hero-meta">This month · 41 pieces made<br>0187 of 2026</div>
-    <div class="hero-copy">
-      <div><p class="label">Hand-spun, hand-woven cashmere from Basohli, Jammu.</p><h1>A week of one person’s life, in every piece.</h1></div>
-      <a class="btn" href="shop.html">Shop the cloth</a>
-    </div>
-  </section>
-
-  ${tick(['This month: <b>41 pieces</b> made', 'No power loom, ever', 'Fibre: Changthangi, Ladakh · 12–14µ', 'Composition: 100% cashmere', 'Duty and VAT paid on every order', 'Nāma cut-off for Christmas: <b>25 November</b>', 'No acid wash. No synthetic reinforcement'])}
-
-  <section class="section" style="padding-top:32px">
-    <div class="grid g3">${['ravi', 'billawar', 'nama'].map(i => card(byId[i])).join('')}
-    </div>
-    <div class="grid g2" style="margin-top:16px">${['sarthal', 'purthu'].map(i => card(byId[i], true)).join('')}
-    </div>
-  </section>
-
-  <section class="duo">
-    <div class="frame"><img src="${I}hub-charkha.jpg" alt="Spinners working at a charkha in a courtyard" loading="lazy"></div>
-    <div>
-      <p class="eyebrow">The people behind KHADDI</p>
-      <svg class="curve" viewBox="0 0 620 150" role="img" aria-label="By hand, or not at all"><path id="arc" d="M6,118 C150,58 330,132 614,62" fill="none"/><text><textPath href="#arc">By hand, or not at all</textPath></text></svg>
-      <h3>The town lost this craft. We are trying to get it back.</h3>
-      <p>Basohli, on the right bank of the Ravi, was once known for its pashmina. Then the looms stopped, and within three generations the skill lived only in the memory of old people. In 2016 three friends — an official who grew up here, a Supreme Court advocate and a designer — started the <strong>Discovering Roots Trust</strong> with their own money to put it back to work. Here are three promises from us:</p>
-      <ul class="promises">
-        <li><strong>No power loom, ever.</strong> If demand outruns the looms, we train more hands.</li>
-        <li><strong>The maker is paid first.</strong> Rates are set before margin and published.</li>
-        <li><strong>Nothing hidden.</strong> Every piece names its spinner, weaver, village and date.</li>
-      </ul>
-      <span class="doodle">${mark(58, 3.5)}</span>
-    </div>
-  </section>
-
-  ${film}
-
-  <section class="section" style="padding-bottom:0">
-    <div class="split">
-      <div class="txt">
-        <span class="eyebrow">Nāma · personalisation</span>
-        <h2>Your name, in thread, in two scripts.</h2>
-        <p>Any stole or shawl can be hand-embroidered with a name, initials, a date or a short line — Latin, Devanagari, or both.</p>
-        <div class="stitch"><div class="latin">For Clara · 12.12.26</div><div class="dv">क्लारा के लिए</div></div>
-        <p style="font-size:14.5px;color:var(--ink-soft);margin-top:10px">Allow 10–18 days. Order by <strong>25 November</strong> for delivery before Christmas. Personalised orders cannot be returned.</p>
-        <a class="btn btn-madder" href="nama.html">Design a Nāma piece</a>
+const words = (t, start) => t.split(' ').map((w, i) => `<span class="w" style="--i:${start + i}"><span>${w}</span></span>`).join(' ');
+const tile = (p, n = 0) => `
+      <a class="tile reveal" style="--d:${(n % 4) * 0.12}s" href="product.html">
+        <div class="plate sq"><img src="${P}${p.img[0]}.jpg" alt="${p.name}, ${p.kind.toLowerCase()}" loading="lazy"></div>
+        <div class="cap"><span>${p.name}</span><span>€${p.price}</span></div>
+      </a>`;
+const clip = (name, alt) => `<img src="${I}clip-${name}.jpg" alt="${alt}" loading="lazy"><video autoplay muted loop playsinline preload="metadata" poster="${I}clip-${name}.jpg" aria-hidden="true"><source src="assets/video/${name}.mp4" type="video/mp4"></video>`;
+const act = (label, num, unit, title, text, film, alt) => `
+      <article class="act">
+        <figure class="unveil"><div class="plate">${clip(film, alt)}<p class="numeral">${num}<small>${unit}</small></p></div></figure>
+        <p class="label soft reveal">${label}</p>
+        <h3 class="title reveal" style="--d:.1s">${title}</h3>
+        <p class="reveal" style="--d:.2s">${text}</p>
+      </article>`;
+page('index.html', 'KHADDI PASHMINA — Basohli, Jammu', 'Pashmina spun and woven entirely by hand in Basohli, Jammu. About forty pieces a month, each signed by the people who made it.', `
+  <section class="hero full bleed">
+    <img src="${I}hero-poster.jpg" alt="A lake on the high plateau of Ladakh">
+    <video autoplay muted loop playsinline preload="metadata" poster="${I}hero-poster.jpg" aria-hidden="true"><source src="assets/video/hero.mp4" type="video/mp4"></video>
+    <div class="caption v2">
+      <p class="label">Khadi-Pashmina · Basohli, Jammu</p>
+      <h1 class="hero-title" aria-label="Warmth without weight. Entirely by hand."><span class="ln">${words('Warmth without weight.', 0)}</span><em class="ln">${words('Entirely by hand.', 3)}</em></h1>
+      <div class="hero-foot">
+        <p class="hero-sub">Pashmina spun and woven by hand in one town, about forty pieces a month.</p>
+        <a class="more" href="shop.html">Discover the pieces</a>
       </div>
-      <div class="pic"><img src="${P}nama-2.jpg" alt="A hand-embroidered border on undyed cashmere" loading="lazy"></div>
     </div>
   </section>
 
-  ${passportBlock}
-  ${diaries}
+  <section class="manifesto room">
+    <div class="mani-words">
+      <p class="label soft reveal">Khadi-Pashmina · Basohli, Jammu</p>
+      <h2 class="display">
+        <span class="line ink reveal" style="--d:.1s">True pashmina is too fine</span>
+        <span class="line ink reveal" style="--d:.25s">for any machine.</span>
+        <span class="line ink reveal" style="--d:.5s"><em>So ours is made entirely by hand.</em></span>
+      </h2>
+      <p class="mani-note reveal" style="--d:.7s">A power loom can only hold this fibre if it is blended with nylon, then washed in acid. We spin it and weave it as it is. About forty pieces a month.</p>
+    </div>
+    <figure class="arch unveil"><div class="plate">${clip('tuft', 'Raw pashmina fibre drawn out by hand')}</div><figcaption>The fibre, before it is thread</figcaption></figure>
+  </section>
+
+  <div class="thread" aria-hidden="true"></div>
+
+  <section class="acts">
+    <div class="acts-head"><p class="label soft reveal">The making</p><h2 class="title reveal" style="--d:.1s">From goat to cloth, <em>in three acts.</em></h2></div>
+    <div class="tri">
+      ${act('I — The fibre', '12–14', 'microns', 'Combed, never shorn.', 'Each spring the goats of the Ladakh plateau let go of their winter coat. It is gathered by hand, many times finer than a human hair.', 'goats', 'Pashmina goats on the high plateau')}
+      ${act('II — The hand', '9', 'days', 'One spinner, one wheel.', 'The yarn for a single shawl is drawn out by one person at a wooden charkha. It cannot be hurried. The thread breaks if you try.', 'wheel', 'A hand turning a wooden spinning wheel')}
+      ${act('III — The loom', '6', 'days', 'Woven on the <em>khaddi.</em>', 'Khaddi is the word for the handloom. No power, no acid, no nylon. The cloth weighs what the fibre weighs, and nothing else.', 'loom', 'A hand at the reed of a handloom')}
+    </div>
+  </section>
+
+  <section class="signature bleed">
+    <svg class="s-thread" viewBox="0 0 1400 1050" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path class="yarn" pathLength="1" d="M1420 330 C1300 355 1250 305 1190 350 C1120 405 1160 470 1215 440 C1265 410 1235 345 1165 358 C1040 380 880 500 660 485 C500 472 380 395 240 440 C150 468 70 455 -20 440"/>
+    </svg>
+    <div class="s-head">
+      <p class="label soft reveal">The signature</p>
+      <h2 class="display reveal" style="--d:.1s">Every piece is signed, <em>like a work of art.</em></h2>
+    </div>
+    <div class="s-stage">
+      <div class="s-left">
+        <dl class="wall-label reveal" style="--d:.2s">
+          <dt>Sarthal, 2026</dt>
+          <dd>Changthangi pashmina, undyed<br>100 × 200 cm, 190 g</dd>
+          <dd>Basohli, Jammu · Piece 0187</dd>
+        </dl>
+        <p class="reveal" style="--d:.3s">A tag stitched into the hem opens the names of the people who made your piece, and the days each of them gave to it.</p>
+        <a class="more reveal" style="--d:.4s" href="passport.html">The Thread Passport</a>
+      </div>
+      <figure class="framed unveil">
+        <div class="plate"><img src="${P}sarthal-1.jpg" alt="Sarthal, an undyed pashmina shawl" loading="lazy"></div>
+        <figcaption><i class="tag"></i>Hold a phone to the hem</figcaption>
+      </figure>
+      <div class="s-right">
+        <p class="label soft reveal">Signed by</p>
+        <ul class="sigs">
+          ${[['Sunita Devi', 'Spun · nine days', 0.2], ['Bishan Dass', 'Woven · six days', 0.7], ['Rekha Devi', 'Finished · two days', 1.2]].map(([n, r, d]) => `<li class="reveal" style="--d:${d}s"><span class="hand">${n}</span><span class="label">${r}</span></li>`).join('\n          ')}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="head"><p class="label soft reveal">Forty-one this month</p><h2 class="title reveal" style="--d:.1s">The October pieces</h2></div>
+  <section style="padding-bottom:0">
+    <div class="tiles">${['ravi', 'billawar', 'nama', 'kesar', 'sarthal', 'purthu', 'bani', 'mahanpur'].map((i, n) => tile(byId[i], n)).join('')}
+    </div>
+    <p class="center" style="padding-top:clamp(44px,5vw,72px)"><a class="more" href="shop.html">View all twelve</a></p>
+  </section>
+
+  <section class="nama-art room">
+    <p class="label soft reveal">Nama</p>
+    <h2 class="title reveal" style="--d:.1s">Your name, in thread.</h2>
+    <div class="stitched"><svg viewBox="0 0 1000 210" role="img" aria-label="For Clara, 12.12.26, stitched in thread">
+      <text x="500" y="128" text-anchor="middle">For Clara · 12.12.26</text>
+      <line x1="170" y1="178" x2="830" y2="178"/>
+    </svg></div>
+    <p class="deva reveal" style="--d:1.6s">क्लारा के लिए</p>
+    <p class="small reveal" style="--d:1.8s">Any piece can be embroidered by hand with a name, a date or a short line. It takes fourteen days, and it is yours alone.</p>
+    <a class="more reveal" style="--d:2s" href="nama.html">Commission a piece</a>
+  </section>
+
+  <section class="passage" style="padding-bottom:0">
+    <p class="label soft reveal">Khaddi, noun</p>
+    <p class="reveal" style="margin-top:22px;--d:.15s">The handloom. We named the house after the one machine we refused to replace.</p>
+    <a class="more reveal" style="--d:.3s" href="story.html">Read the story</a>
+  </section>
 `, { home: true });
 
 /* ───────── SHOP ───────── */
-page('shop.html', 'Shop — KHADDI', 'Stoles, shawls and mufflers, hand-spun and hand-woven in Basohli. Forty-one pieces this month.', `
-  <div class="shop-head">
-    <h1>The KHADDI pieces</h1>
-    <p>Forty-one pieces this month. Each one shows who spun it and how long it took.</p>
-    <div class="filters"><span class="chip on">All 12</span><span class="chip">Stoles</span><span class="chip">Shawls</span><span class="chip">Mufflers</span><span class="chip">Undyed</span><span class="chip">Natural dye</span><span class="chip">Nāma</span></div>
+page('shop.html', 'Shop — KHADDI PASHMINA', 'Stoles, shawls and mufflers, spun and woven by hand in Basohli.', `
+  <div class="page-head"><h1 class="display">The pieces</h1></div>
+  <div class="shelf">
+    <div class="slash"><a class="on" href="#">All</a><a href="#">Stoles</a><a href="#">Shawls</a><a href="#">Mufflers</a><a href="#">Nama</a></div>
+    <p class="small">12 pieces</p>
   </div>
-  <div class="capacity">
-    <div><b class="n">29</b> <span>of 41 sold in October</span></div>
-    <div class="meter" role="img" aria-label="29 of 41 pieces sold"><i style="width:70.7%"></i></div>
-    <a class="btn btn-lapis" href="#">Join the November list</a>
+  <div class="cards g3 bleed">${products.map(piece).join('')}
   </div>
-  <div class="grid g3">${products.map(p => card(p)).join('')}
-  </div>
-  <section class="section" style="padding-bottom:0">
-    <div class="panel ink">
-      <span class="eyebrow">Why there are only forty-one</span>
-      <h2>We do not switch machines on.</h2>
-      <p>Twelve spinners and four looms make about forty pieces a month. When they are gone, the list opens for the next drop. We would rather you wait than receive something made faster.</p>
-    </div>
-  </section>
 `);
 
 /* ───────── PRODUCT ───────── */
-const sp = byId.sarthal;
-page('product.html', `${sp.name} — KHADDI`, 'Hand-spun and hand-woven in Basohli, Jammu, from Changthangi fibre reared in Ladakh.', `
+page('product.html', 'Sarthal, shawl — KHADDI PASHMINA', 'Sarthal: an undyed pashmina shawl, spun and woven by hand in Basohli, Jammu.', `
   <div class="pdp">
-    <div class="thumbs">${['sarthal-1', 'drape-2', 'drape-3', 'sarthal-2'].map((s, i) => `<img${i ? '' : ' class="on"'} src="${P}${s}.jpg" alt="${sp.name}, view ${i + 1}">`).join('')}</div>
-    <div class="pdp-main"><img src="${P}sarthal-1.jpg" alt="${sp.name} draped over a stone wall"></div>
-    <div class="pdp-info">
-      <div class="row"><span class="eyebrow">Piece No. 0187 of 2026</span><span class="heart">${heart}</span></div>
-      <h1>${sp.name}</h1>
-      <p class="type">Shawl · 100 × 200 cm · undyed</p>
+    <div class="thumbs">${['sarthal-1', 'drape-3', 'sarthal-2', 'drape-2'].map((s, i) => `<div class="plate${i ? '' : ' on'}"><img src="${P}${s}.jpg" alt="Sarthal, view ${i + 1}"></div>`).join('')}</div>
+    <div class="plate main"><img src="${P}sarthal-1.jpg" alt="Sarthal shawl draped over stone"></div>
+    <div class="info">
+      <h1 class="title">Sarthal</h1>
       <p class="price">€390</p>
-      <p class="ddp">Duty and VAT included. Nothing to pay at the door.</p>
-      <p class="desc">Plain weave in undyed fibre, finished with tassels knotted by hand. Sunita spun the yarn over nine days in September; Bishan wove it in six on loom no. 4. Nothing was added to the fibre and nothing was washed out of it.</p>
-
-      <div class="blk">
-        <span class="lab">Made by</span>
-        <div class="made">
-          <div><small>Spun</small><b>Sunita Devi</b><span>9 days · Basohli</span></div>
-          <div><small>Woven</small><b>Bishan Dass</b><span>6 days · loom no. 4</span></div>
-          <div><small>Finished</small><b>Rekha Devi</b><span>2 days · tassels</span></div>
-        </div>
+      <p class="desc">An undyed shawl in plain weave, finished with tassels knotted by hand. Spun by Sunita Devi over nine days; woven by Bishan Dass in six.</p>
+      <dl class="spec">
+        <div><dt>Fibre</dt><dd>Changthangi, Ladakh · 13.2 microns</dd></div>
+        <div><dt>Size</dt><dd>100 × 200 cm · 190 g</dd></div>
+        <div><dt>Colour</dt><dd class="threads"><i class="on" style="background:#ece4d2"></i><i style="background:#b8aea0"></i><i style="background:#8c3a2b"></i><span>Undyed</span></dd></div>
+      </dl>
+      <a class="btn solid" href="bag.html">Add to bag</a>
+      <p class="note">Duty and taxes paid · arrives by 21 October</p>
+      <div class="acc">
+        <details><summary>Composition and care</summary><div class="in">100% cashmere, the fibre known as pashmina. Wash by hand in cool water, dry flat, store folded. If it is ever damaged, it comes back to the person who made it.</div></details>
+        <details><summary>Delivery and returns</summary><div class="in">Sent within two days, about a week to Europe. Fourteen days to change your mind. Pieces embroidered with a name cannot be returned.</div></details>
+        <details><summary>Where the price goes</summary><div class="in"><ul><li><span>The three people who made it</span><span>€151</span></li><li><span>Fibre, from Ladakh</span><span>€55</span></li><li><span>The trust: training and new looms</span><span>€74</span></li><li><span>Shipping, duty and taxes</span><span>€63</span></li><li><span>Box, tag and payment</span><span>€47</span></li></ul></div></details>
+        <details><summary>Add your name in thread</summary><div class="in">Any piece can be embroidered by hand, from €70. <a href="nama.html" style="border-bottom:1px solid var(--line)">Commission it</a>.</div></details>
       </div>
-
-      <div class="blk">
-        <span class="lab">Colour</span>
-        <div class="chips" style="align-items:center;gap:14px"><span class="opt"><span class="dot on" style="background:${SW.undyed}"></span>Undyed</span><span class="opt"><span class="dot" style="background:${SW.grey}"></span>Natural grey</span><span class="opt"><span class="dot" style="background:${SW.madder}"></span>Madder root</span></div>
-      </div>
-
-      <div class="blk">
-        <label for="nama">Add Nāma embroidery <span style="color:var(--ink-soft);font-size:14.5px">+ €90 · 14 more days</span></label>
-        <input id="nama" class="field" type="text" placeholder="A name, initials, a date or a short line">
-        <div class="chips" style="margin-top:10px"><span class="chip on">Latin</span><span class="chip">देवनागरी</span><span class="chip">Both</span></div>
-      </div>
-
-      <div class="blk">
-        <div class="buy"><span class="left">Arrives by 21 Oct</span><a class="btn btn-madder" href="#">Add to cart — €390</a></div>
-        <p class="ddp" style="margin-top:10px">Ships in 48 hours from Delhi. The delivery date is guaranteed before you pay, not after.</p>
-      </div>
-
-      <details class="acc" open>
-        <summary>Where the €390 goes</summary>
-        <div class="in">
-          <p>Of this €390, <strong>€151 went to the three people who made it.</strong></p>
-          <div class="bar"><i style="width:38.7%;background:var(--lapis)"></i><i style="width:14%;background:var(--saffron)"></i><i style="width:16.3%;background:var(--beetle)"></i><i style="width:19%;background:var(--madder)"></i><i style="width:12%;background:var(--undyed-3)"></i></div>
-          <ul class="legend"><li><i style="background:var(--lapis)"></i>Makers — spinning, weaving, finishing<b>€151</b></li><li><i style="background:var(--saffron)"></i>Fibre, from Ladakh<b>€55</b></li><li><i style="background:var(--beetle)"></i>Shipping, duty and VAT<b>€63</b></li><li><i style="background:var(--madder)"></i>The trust — training and new looms<b>€74</b></li><li><i style="background:var(--undyed-3)"></i>Packaging, tag and payment fees<b>€47</b></li></ul>
-        </div>
-      </details>
-      <details class="acc"><summary>Fibre and lab test</summary><div class="in">Composition: 100% cashmere. Changthangi fibre reared in Ladakh, 13.2 microns, lab-tested, batch 0187. No acid wash. No synthetic reinforcement.</div></details>
-      <details class="acc"><summary>Care and repair</summary><div class="in">Wash by hand in cool water, dry flat, store folded. If it is ever damaged, book a repair through the Thread Passport and it goes back to the hub.</div></details>
-      <details class="acc"><summary>Returns</summary><div class="in">Fourteen days to change your mind on in-stock pieces. Personalised orders cannot be returned.</div></details>
     </div>
   </div>
 
-  <section class="banner"><img src="${P}drape-3.jpg" alt="" loading="lazy"><h2>Knotted by hand, one tassel at a time</h2></section>
-  ${tick(['Weave: plain', 'Size: 100 × 200 cm', 'Weight: 190 g', 'Fibre: Changthangi, 13.2µ', 'Dye: undyed', 'Craft: hand-spun, hand-woven Khadi-Pashmina', 'Made in Basohli, Jammu, India'])}
+  <div class="head"><h2 class="title">More pieces</h2></div>
+  <div class="cards g3 bleed">${['ravi', 'purthu', 'kesar'].map(i => piece(byId[i])).join('')}
+  </div>
+`);
 
-  <section class="section">
-    <h2 class="section-title">What owners say</h2>
-    <div class="quotes"><div class="quotes-track">${[...Array(2)].flatMap(() => [['MK', 'Marieke, Utrecht', 'Piece 0142', 'I tapped the tag at dinner and my mother-in-law watched the loom video twice.'], ['JB', 'Jonas, Berlin', 'Piece 0098', 'It arrived on the day you said. No customs letter, no surprise bill.'], ['AS', 'Anjali, London', 'Piece 0117', 'My grandmother’s name in Devanagari, on the border. She has not taken it off.'], ['CL', 'Claire, Lyon', 'Piece 0156', 'You can feel that nothing has been done to the fibre. It is lighter than I expected.'], ['HV', 'Henrik, Malmö', 'Piece 0131', 'I read the cost breakdown before I bought. That was what decided it.']]).map(([i, n, pc, q]) => `<div class="qcard"><div class="who"><span class="avatar">${i}</span><div><b>${n}</b><span>${pc}</span></div></div><p>${q}</p></div>`).join('')}</div></div>
-  </section>
-
-  <section class="section" style="padding-top:0">
-    <h2 class="section-title">More from this month</h2>
-    <div class="grid g3" style="max-width:1140px;margin:0 auto">${['ravi', 'purthu', 'nama'].map(i => card(byId[i])).join('')}
-    </div>
-  </section>
-
-  ${film}
-
-  <section class="section" style="padding-bottom:0">
-    <h2 class="section-title">Questions</h2>
-    <div class="faq">
-      <details class="acc"><summary>Is this pashmina or cashmere?</summary><div class="in">Both words describe the same fibre. European law asks us to write “100% cashmere” on the composition label, so we do. Khadi-Pashmina is our name for the process: spun and woven entirely by hand.</div></details>
-      <details class="acc"><summary>Will I pay customs when it arrives?</summary><div class="in">No. Every price includes duty and VAT, and the courier is paid before the parcel leaves India.</div></details>
-      <details class="acc"><summary>Why does it take a week to make?</summary><div class="in">Because pashmina fibre is too fine for a machine unless it is blended with nylon and then washed in acid. We spin and weave it as it is.</div></details>
-      <details class="acc"><summary>What is the tag in the hem?</summary><div class="in">An NFC chip. Hold a phone to it and you see who made your piece. It can be removed without harming the cloth.</div></details>
-    </div>
-  </section>
+/* ───────── BAG ───────── */
+const bagRows = [[byId.sarthal, 'Undyed · 100 × 200 cm', 390], [byId.nama, 'Embroidered “For Clara · 12.12.26”', 570]];
+page('bag.html', 'Your bag — KHADDI PASHMINA', 'Your bag.', `
+  <div class="page-head"><h1 class="display">Your bag</h1></div>
+  <div class="bagpage">
+    <ul class="lines">${bagRows.map(([p, opt, price]) => `
+      <li>
+        <a class="plate" href="product.html"><img src="${P}${p.img[0]}.jpg" alt="${p.name}"></a>
+        <div>
+          <p class="label">${p.name}</p>
+          <p class="small">${opt}</p>
+          <p class="small" style="margin-top:14px"><a href="#" style="border-bottom:1px solid var(--line)">Remove</a></p>
+        </div>
+        <p class="amount">€${price}</p>
+      </li>`).join('')}
+    </ul>
+    <aside class="summary">
+      <dl>
+        <div><dt>Two pieces</dt><dd>€960</dd></div>
+        <div><dt>Delivery, duty and taxes</dt><dd>Included</dd></div>
+        <div class="total"><dt>Total</dt><dd>€960</dd></div>
+      </dl>
+      <a class="btn solid" href="#">Checkout</a>
+    </aside>
+  </div>
 `);
 
 /* ───────── STORY ───────── */
-page('story.html', 'The Story — KHADDI', 'How three friends put a lost craft back to work in Basohli, Jammu.', `
-  <section class="split" style="background:var(--undyed-2)">
-    <div class="txt center">
-      <div class="bigmark" style="color:var(--lapis);font-size:clamp(48px,7vw,96px)">KHADDI</div>
-      <div class="deva" style="font-size:24px;color:var(--lapis);margin:8px 0 26px">खड्डी</div>
-      <p><em>Khaddi</em> is the handloom. We named the cloth after the machine we refused to replace.</p>
+page('story.html', 'The story — KHADDI PASHMINA', 'How a lost craft was put back to work in Basohli, Jammu.', `
+  <section class="split bleed">
+    <div class="txt mid">
+      <span class="logo">${logo}</span>
+      <p class="small" style="margin-bottom:0"><em>Khaddi</em> is the word for the handloom. We named the house after the one machine we refused to replace.</p>
     </div>
-    <div class="pic"><img src="${I}loom-wide.jpg" alt="A wooden handloom with cloth on the beam"></div>
+    <div class="pic"><img src="${I}loom-wide.jpg" alt="Cloth on the beam of a wooden handloom"></div>
   </section>
 
-  <section class="panel lapis" style="margin-top:32px">
-    <span class="eyebrow">About the Discovering Roots Trust</span>
-    <h2>A craft that had already died once.</h2>
-    <p>Basohli was founded around 1635 on a branch of the silk route, and its bazaar had shops known for pashmina. Then machine-made “pashmina” arrived — blended with nylon, woven in five minutes, the synthetic washed out with acid. The mill won on price and the looms here stopped.</p>
-    <p>The trust is not funded by a government or a donor. It runs on what the cloth earns.</p>
-  </section>
+  <div class="page-head" style="padding-top:var(--room)">
+    <p class="label soft">The story</p>
+    <h1 class="display">A craft that had <em>already died once.</em></h1>
+  </div>
 
-  <section class="banner" style="height:min(70vh,560px)"><img src="${I}texture-weave.jpg" alt="" loading="lazy"><blockquote>“Nothing in the cloth that a goat and a person did not put there.”</blockquote></section>
-
-  <section class="about">
-    <div class="frame"><img src="${C}basohli-palace.jpg" alt="The ruins of the palace at Basohli" loading="lazy"></div>
-    <div>
-      <span class="eyebrow">How it started</span>
-      <p>Shakti Pathak grew up in Basohli on stories of the palace and its shawls. He could not accept that his own town had lost the thing it was known for.</p>
-      <p>Two friends went looking with him: Venkata Krishna, an advocate at the Supreme Court of India, and Rajni Sharma, a designer. They found the last people who remembered the old looms, and asked to be taught.</p>
-      <p>Then they did something nobody had tried. They took the tools of khadi — the hand-spun, hand-woven cotton tradition — and used them on pashmina fibre. They called it Khadi-Pashmina.</p>
-      <p>Their own money, their own weekends, their own risk. That was 2016.</p>
+  <section class="chapter">
+    <div class="words">
+      <p class="label soft">c. 1635 — The town</p>
+      <h2 class="title">On the right bank of the Ravi.</h2>
+      <div class="prose"><p>Basohli was founded on a branch of the silk route. Its bazaar had shops known for pashmina, and its palace kept the weavers in work.</p></div>
     </div>
+    <div class="pic">${fig(`${C}basohli-palace.jpg`, 'land', 'The ruins of the palace at Basohli', ['I', 'The palace at Basohli'])}</div>
   </section>
 
-  <section class="section" style="padding-top:0">
-    <div class="founders">
-      <div class="founder"><span class="eyebrow">The itch</span><h3>Shakti Pathak</h3><p>Grew up in Basohli. Became a senior official with the Government of J&amp;K, and came back for the looms.</p></div>
-      <div class="founder"><span class="eyebrow">The lawyer</span><h3>Venkata Krishna</h3><p>Advocate, Supreme Court of India. A working life spent on rights and provenance, now applied to a village craft.</p></div>
-      <div class="founder"><span class="eyebrow">The designer</span><h3>Rajni Sharma</h3><p>Sat with the weavers, rebuilt the technique, and turned a revival into something people would want to wear.</p></div>
+  <section class="room chapter flip">
+    <div class="words">
+      <p class="label soft">The loss</p>
+      <h2 class="title">Then the looms stopped.</h2>
+      <div class="prose"><p>A machine cannot hold a fibre this fine. So the mills blend it with nylon, weave it in five minutes, and burn the nylon out with acid.</p><p>The price fell. Within three generations the skill lived only in the memory of the old.</p></div>
     </div>
+    <div class="pic">${fig(`${P}detail-tassel.jpg`, 'port', 'Hand-finished edge of a pashmina shawl', ['II', 'What a hand leaves behind'])}</div>
   </section>
 
-  <section class="section" style="padding-top:0">
-    <div class="timeline">
-      <div><b>c. 1635</b><p>Raja Bhupat Pal founds Basohli on the right bank of the Ravi.</p></div>
-      <div><b>17th c.</b><p>The bazaar is known for its pashmina. The palace keeps the weavers in work.</p></div>
-      <div><b>2016</b><p>The trust sets up the first loom and the first group of spinners.</p></div>
-      <div><b>2026</b><p>Twelve spinners, four looms, about forty pieces a month.</p></div>
+  <section class="banner bleed"><img src="${I}hero-loom.jpg" alt="" loading="lazy"><blockquote class="statement">“Nothing in the cloth that a goat and a person did not put there.”</blockquote></section>
+
+  <div class="head"><p class="label soft">2016</p><h2 class="title">Three friends</h2></div>
+  <div class="cols bleed">
+    <div><p class="label soft">Who grew up here</p><h3 class="title">Shakti Pathak</h3><p class="small">Raised in Basohli on stories of the palace and its shawls. He became a senior government official, and came back for the looms.</p></div>
+    <div><p class="label soft">The advocate</p><h3 class="title">Venkata Krishna</h3><p class="small">Of the Supreme Court of India. A working life spent on rights and provenance, now given to a village craft.</p></div>
+    <div><p class="label soft">The designer</p><h3 class="title">Rajni Sharma</h3><p class="small">She sat with the weavers, rebuilt the technique, and made the revival into something to be worn.</p></div>
+  </div>
+
+  <section class="room chapter">
+    <div class="words">
+      <p class="label soft">The revival</p>
+      <h2 class="title">Khadi, applied to pashmina.</h2>
+      <div class="prose"><p>They found the last people who remembered the old looms and asked to be taught. Then they took the tools of khadi, the hand-spun cotton of India’s freedom movement, and used them on pashmina fibre.</p><p>Their own money, their own weekends. No government and no donor. The trust runs on what the cloth earns.</p></div>
     </div>
+    <div class="pic">${fig(`${C}loom.jpg`, 'land', 'A weaver at a wooden handloom', ['III', 'The first looms, Basohli'])}</div>
   </section>
 
-  <section class="panel madder">
-    <span class="eyebrow">Five things we will not trade away</span>
-    <h2>If it makes the brand louder and the story less true, we don’t do it.</h2>
-    <div class="values" style="margin-top:32px">
-      <div><span class="eyebrow">01 By hand, or not at all</span><p>No power loom, ever. We train more hands instead.</p></div>
-      <div><span class="eyebrow">02 Nothing hidden</span><p>Spinner, weaver, village and date on every piece.</p></div>
-      <div><span class="eyebrow">03 The maker is paid first</span><p>Rates set before margin and published openly.</p></div>
-      <div><span class="eyebrow">04 Nothing added</span><p>Organic starch. No carbonising, no acid wash, no nylon.</p></div>
-      <div><span class="eyebrow">05 Slow is the point</span><p>A week per shawl is why it outlives you.</p></div>
-    </div>
+  <div class="head"><p class="label soft">Five things we will not trade away</p><h2 class="title">What we promise</h2></div>
+  <section>
+    <ul class="vows">
+      <li><span class="label">I — By hand, or not at all</span><p>No power loom, ever. If more is asked of us, we train more hands.</p></li>
+      <li><span class="label">II — Nothing hidden</span><p>Every piece names its spinner, its weaver, its village and its date.</p></li>
+      <li><span class="label">III — The maker is paid first</span><p>Rates are set before margin, and published.</p></li>
+      <li><span class="label">IV — Nothing added</span><p>Organic starch. No carbonising, no acid wash, no nylon.</p></li>
+      <li><span class="label">V — Slow is the point</span><p>A week for a shawl is why it will outlive you.</p></li>
+    </ul>
+    
   </section>
-  ${diaries}
 `);
 
-/* ───────── NĀMA ───────── */
-page('nama.html', 'Nāma — personalised Khadi-Pashmina — KHADDI', 'Any KHADDI stole or shawl, hand-embroidered with a name, initials, a date or a short line.', `
-  <section class="split">
+/* ───────── NAMA ───────── */
+page('nama.html', 'Nama — KHADDI PASHMINA', 'Any KHADDI piece, embroidered by hand with a name, a date or a short line.', `
+  <section class="split bleed">
+    <div class="pic"><img src="${P}nama-2.jpg" alt="A hand-embroidered border on undyed pashmina"></div>
     <div class="txt">
-      <span class="eyebrow">Nāma · the signature</span>
-      <h2>A commission, not a scarf.</h2>
-      <p>Choose a piece, type a name, pick a thread. Rekha and her group embroider it by hand along the border. Latin script, Devanagari, or both.</p>
-      <div class="blk" style="border-top:0;padding-top:6px">
-        <label for="n1" class="lab">Your line <span style="font-size:14px;color:var(--ink-soft)">up to 24 characters</span></label>
-        <input id="n1" class="field" style="background:var(--undyed)" value="For Clara · 12.12.26">
-      </div>
-      <div class="blk"><span class="lab">Script</span><div class="chips"><span class="chip">Latin</span><span class="chip">देवनागरी</span><span class="chip on">Both</span></div></div>
-      <div class="blk"><span class="lab">Thread</span><div class="chips" style="gap:12px"><span class="dot on" style="background:${SW.madder}"></span><span class="dot" style="background:${SW.lapis}"></span><span class="dot" style="background:${SW.saffron}"></span><span class="dot" style="background:#5b6b46"></span><span class="dot" style="background:${SW.undyed}"></span></div></div>
-      <div class="blk"><span class="lab">Placement</span><div class="chips"><span class="chip on">Border, one end</span><span class="chip">Border, both ends</span><span class="chip">Corner</span></div></div>
-      <a class="btn btn-madder" href="shop.html">Choose a piece — from €380</a>
-    </div>
-    <div class="pic" style="background:var(--undyed-2);display:grid;place-items:center;padding:40px">
-      <img src="${P}detail-stitch.jpg" alt="Hand embroidery along the edge of a shawl" style="opacity:.92">
-      <div class="stitch" style="position:relative;z-index:2;width:min(86%,440px);background-color:rgba(244,239,228,.94);text-align:center;box-shadow:0 30px 60px -30px rgba(20,22,28,.5)">
-        <span class="eyebrow">Live preview</span>
-        <div class="latin" style="margin-top:8px">For Clara · 12.12.26</div>
-        <div class="dv">क्लारा के लिए</div>
-      </div>
+      <p class="label soft">Nama · made to your name</p>
+      <h1 class="title">A commission, <em>not a scarf.</em></h1>
+      ${stitch}
+      <form class="form" style="width:100%;max-width:520px">
+        <label class="label" for="n1">Your line</label><input id="n1" class="field" value="For Clara · 12.12.26">
+        <span class="label">Script</span><div class="choice"><span>Latin</span><span class="deva">देवनागरी</span><span class="on">Both</span></div>
+        <span class="label">Thread</span><div class="threads"><i class="on" style="background:#8c3a2b"></i><i style="background:#24427f"></i><i style="background:#c08a3a"></i><i style="background:#5b6b46"></i><i style="background:#ece4d2"></i></div>
+        <span class="label">Placement</span><div class="choice"><span class="on">One end</span><span>Both ends</span><span>Corner</span></div>
+      </form>
+      <a class="btn solid" href="shop.html" style="max-width:520px;margin-top:36px">Choose a piece — from €380</a>
+      <p class="note" style="max-width:520px;width:100%;margin-top:12px">A drawn proof is sent within a day. Nothing is stitched until you approve it.</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="stats">
-      <div class="stat"><b>25 Nov</b><span>Last day to order a Nāma piece for delivery before Christmas.</span></div>
-      <div class="stat"><b>14 days</b><span>Embroidery by hand, after the piece is woven.</span></div>
-      <div class="stat"><b>7 days</b><span>Shipping to the EU, duty and VAT paid.</span></div>
-      <div class="stat"><b>+ €70–110</b><span>Added to the piece, by length of line and number of scripts.</span></div>
-    </div>
-  </section>
+  <div class="facts bleed gap-s">
+    <div><b>25 November</b><span class="small">Last day to commission for delivery before Christmas.</span></div>
+    <div><b>Fourteen days</b><span class="small">Of embroidery, after the piece is woven.</span></div>
+    <div><b>From €380</b><span class="small">The piece, with €70 to €110 for the embroidery.</span></div>
+    <div><b>Yours alone</b><span class="small">A piece made to your name cannot be returned.</span></div>
+  </div>
 
-  <section class="section" style="padding-top:0">
-    <h2 class="section-title">How a Nāma piece is made</h2>
-    <div class="grid g4">
-      <div class="step"><img src="${P}ravi-1.jpg" alt="" loading="lazy"><div><span class="n">01</span><h3>Pick the cloth</h3><p>Any stole or shawl in the shop, or one from the next drop.</p></div></div>
-      <div class="step"><img src="${P}detail-stitch.jpg" alt="" loading="lazy"><div><span class="n">02</span><h3>Write the line</h3><p>We send a drawn proof in both scripts within a day. Nothing is stitched until you say yes.</p></div></div>
-      <div class="step"><img src="${C}embroidery.jpg" alt="Embroiderers at work in the hub" loading="lazy"><div><span class="n">03</span><h3>Embroidered</h3><p>By hand, in the hub in Basohli. The embroiderer’s name goes on the passport.</p></div></div>
-      <div class="step"><img src="${P}nama-1.jpg" alt="" loading="lazy"><div><span class="n">04</span><h3>Filmed and sent</h3><p>Forty seconds of your name being stitched, then a numbered box to your door.</p></div></div>
-    </div>
-  </section>
-
-  <section class="panel ink">
-    <span class="eyebrow">Before you order</span>
-    <h2>Personalised orders cannot be returned.</h2>
-    <p>EU rules give fourteen days to change your mind, but not on something made to your specification. We will always send the proof first, and we will re-embroider at cost if you ever want it changed.</p>
-  </section>
+  <div class="head"><p class="label soft">Begin with a piece</p><h2 class="title">Pieces to make your own</h2></div>
+  <div class="cards g3 bleed">${['nama', 'mahanpur', 'chanchlo'].map(i => piece(byId[i])).join('')}
+  </div>
 `);
 
 /* ───────── MAKERS ───────── */
-const makers = [['Shabnam Devi', 'Spinner · 11 years', 'S', 'I know a piece is finished when the thread stops arguing with me.', 62], ['Bishan Dass', 'Weaver · loom no. 4 · 23 years', 'B', 'My father had this loom. For twenty years it had nothing on it.', 48], ['Rekha Devi', 'Embroiderer · 8 years', 'R', 'A name takes me two days. I say it aloud while I work.', 71], ['Sunita Devi', 'Spinner · 6 years', 'S', 'The hardest part is the first hour. After that the hands remember.', 39], ['Kamlesh Kumari', 'Spinner and dyer · 9 years', 'K', 'Madder root is slow. It gives you the colour when it is ready.', 44], ['Mohd. Rafiq', 'Weaver · loom no. 2 · 17 years', 'M', 'I want whoever buys this to know it was not made in a hurry.', 53]];
-page('makers.html', 'The Makers — KHADDI', 'The spinners, weavers and embroiderers of the Basohli hub, by name.', `
-  <div class="shop-head">
-    <h1>The Makers</h1>
-    <p>Sixteen people work in the hub. Each has a page, and each is named on what they make.</p>
+const makers = [['Shabnam Devi', 'Spinner · eleven years', 'I know a piece is finished when the thread stops arguing with me.', 62], ['Bishan Dass', 'Weaver, loom no. 4 · twenty-three years', 'My father had this loom. For twenty years it had nothing on it.', 48], ['Rekha Devi', 'Embroiderer · eight years', 'A name takes me two days. I say it aloud while I work.', 71], ['Sunita Devi', 'Spinner · six years', 'The hardest part is the first hour. After that the hands remember.', 39], ['Kamlesh Kumari', 'Spinner and dyer · nine years', 'Madder root is slow. It gives you the colour when it is ready.', 44], ['Mohd. Rafiq', 'Weaver, loom no. 2 · seventeen years', 'I want whoever buys this to know it was not made in a hurry.', 53]];
+page('makers.html', 'The makers — KHADDI PASHMINA', 'The spinners, weavers and embroiderers of the Basohli hub, by name.', `
+  <div class="page-head">
+    <p class="label soft">The makers</p>
+    <h1 class="display">Sixteen people, <em>by name.</em></h1>
+    <p>Each is named on what they make, and described by their craft and their years at it.</p>
   </div>
-  <div class="stats">
-    <div class="stat"><b>16</b><span>People earning from the hub this month.</span></div>
-    <div class="stat"><b>41</b><span>Pieces made in October, numbered against the year.</span></div>
-    <div class="stat"><b>38.7%</b><span>Of an average piece’s price goes to the people who made it.</span></div>
-    <div class="stat"><b>2016</b><span>The year the first loom went back to work.</span></div>
-  </div>
+  ${strip.replace(' gap">', '">')}
 
-  <section class="section">
-    <div class="grid g3">${makers.map(([n, r, i, q, pcs]) => `
-      <a class="maker" href="#"><div class="ph">${i}<small>Portrait · shoot week</small></div><div class="b"><h3>${n}</h3><p class="r">${r} · ${pcs} pieces</p><q>${q}</q></div></a>`).join('')}
-    </div>
+  <section class="room">
+    <ul class="index">${makers.map(([n, r, q, pcs]) => `
+      <li><span class="n">${n}</span><span class="c">${r}</span><span class="q">“${q}”</span><span class="c">${pcs} pieces</span></li>`).join('')}
+    </ul>
   </section>
 
-  <section class="section" style="padding-top:0">
-    <h2 class="section-title">From goat to cloth, by hand</h2>
-    <div class="grid g4">
-      <div class="step"><img src="${C}goats.jpg" alt="Goats grazing on the Changthang plateau" loading="lazy"><div><span class="n">01</span><h3>The fibre</h3><p>Combed from Changthangi goats in Ladakh each spring. 12–14 microns.</p></div></div>
-      <div class="step"><img src="${C}dehairing.jpg" alt="Women separating fibre by hand" loading="lazy"><div><span class="n">02</span><h3>Dehairing</h3><p>The coarse guard hair is picked out by hand. No carbonising.</p></div></div>
-      <div class="step"><img src="${C}charkha.jpg" alt="A spinner at a box charkha" loading="lazy"><div><span class="n">03</span><h3>Spinning</h3><p>On a charkha. About nine days of yarn for one shawl.</p></div></div>
-      <div class="step"><img src="${C}weaver.jpg" alt="A weaver at the loom" loading="lazy"><div><span class="n">04</span><h3>Weaving</h3><p>On a khaddi. Three to six days, with organic starch on the warp.</p></div></div>
-    </div>
-  </section>
-
-  ${film}
-
-  <section class="section" style="padding-bottom:0">
-    <h2 class="section-title">What we pay</h2>
-    <div style="max-width:980px;margin:0 auto">
+  <section style="padding-bottom:0">
+    <div style="max-width:900px;margin:0 auto">
+      <p class="label">What we pay</p>
+      <p class="small" style="margin:14px 0 34px;max-width:52ch">Rates are set before margin, published here, and reviewed each April with the people who do the work.</p>
       <table class="t">
-        <thead><tr><th>Work</th><th>Unit</th><th>Rate</th><th>On a €390 shawl</th></tr></thead>
+        <thead><tr><th>Work</th><th>Unit</th><th>Rate</th></tr></thead>
         <tbody>
-          <tr><td>Dehairing and carding</td><td>per 100 g of clean fibre</td><td>₹1,400</td><td>€29</td></tr>
-          <tr><td>Spinning</td><td>per day at the charkha</td><td>₹650</td><td>€64</td></tr>
-          <tr><td>Weaving</td><td>per day at the loom</td><td>₹850</td><td>€46</td></tr>
-          <tr><td>Finishing and tassels</td><td>per piece</td><td>₹1,100</td><td>€12</td></tr>
-          <tr><td>Embroidery (Nāma)</td><td>per day</td><td>₹750</td><td>—</td></tr>
+          <tr><td>Dehairing and carding</td><td>per 100 g of clean fibre</td><td>₹1,400</td></tr>
+          <tr><td>Spinning</td><td>per day at the charkha</td><td>₹650</td></tr>
+          <tr><td>Weaving</td><td>per day at the loom</td><td>₹850</td></tr>
+          <tr><td>Finishing</td><td>per piece</td><td>₹1,100</td></tr>
+          <tr><td>Embroidery</td><td>per day</td><td>₹750</td></tr>
         </tbody>
       </table>
-      <p style="font-size:14px;color:var(--ink-soft);margin-top:12px">Rates are set before margin. They are reviewed each April with the people who do the work.</p>
+      <p class="center" style="margin-top:44px"><a class="more" href="shop.html">Shop what they made this month</a></p>
     </div>
   </section>
 `);
 
 /* ───────── PASSPORT ───────── */
-page('passport.html', 'Thread Passport — Piece No. 0187 — KHADDI', 'The digital record stitched into every KHADDI piece.', `
-  <section class="passport" style="grid-template-columns:.9fr 1.1fr">
-    ${phone}
-    <div>
-      <span class="eyebrow">khaddipashmina.com/p/0187</span>
-      <h2>This is what opens when you tap the hem.</h2>
-      <p>The page is built for ten seconds at a dinner table: a phone, a shawl, and the face of the person who made it. It loads in under a second and can be shared in one tap.</p>
-      <ol><li>Opens with the maker, not with us.</li><li>Four names, and the days each spent on the piece.</li><li>Fibre, micron count, dye and lab batch.</li><li>A forty-second film of this piece on the loom.</li><li>Care, repair and re-embroidery booking.</li></ol>
-      <a class="btn" href="shop.html">Shop the cloth</a>
+page('passport.html', 'Thread Passport — KHADDI PASHMINA', 'The record stitched into every KHADDI piece.', `
+  <section class="split bleed">
+    <div class="txt mid" style="padding-top:56px;padding-bottom:56px">
+      <div class="device"><div class="screen">
+        <div class="top"><span>Thread Passport</span><span>0187 / 2026</span></div>
+        <div class="face"><img src="${C}charkha.jpg" alt="The spinner at her charkha"></div>
+        <div class="who"><span>Spun by</span><b>Shabnam Devi</b><span>Nine days · Basohli</span></div>
+        <ul>
+          <li><span>Woven</span><span>Bishan Dass · six days</span></li>
+          <li><span>Embroidered</span><span>Rekha Devi</span></li>
+          <li><span>Fibre</span><span>Changthangi · 13.2 microns</span></li>
+          <li><span>Film</span><span>Forty seconds on the loom</span></li>
+        </ul>
+      </div></div>
+    </div>
+    <div class="txt" style="background:var(--paper)">
+      <p class="label soft">The Thread Passport</p>
+      <h1 class="title">Hold a phone to the hem.</h1>
+      <div class="prose" style="color:var(--soft)"><p>A page opens. There is no app. It begins with the face of the person who made your piece, and it is as easy to show to someone else as it is to read yourself.</p></div>
+      <ol class="steps" style="width:100%">
+        <li>The piece number, against the year’s total.</li>
+        <li>Who spun it, who wove it, and for how many days.</li>
+        <li>The fibre, its fineness and its lab batch.</li>
+        <li>Forty seconds of your piece on the loom.</li>
+        <li>Care, repair and re-embroidery, when you need them.</li>
+      </ol>
+      <a class="more" href="shop.html">Shop the pieces</a>
     </div>
   </section>
 
-  <section class="section">
-    <div class="stats">
-      <div class="stat"><b>NFC</b><span>A tag stitched under the hem label. Never glued or heat-pressed.</span></div>
-      <div class="stat"><b>QR</b><span>Printed beside it, for phones that will not tap.</span></div>
-      <div class="stat"><b>1 of 1</b><span>Each tag is unique and cannot be copied onto another piece.</span></div>
-      <div class="stat"><b>No app</b><span>It opens in the browser, for you or for anyone you show it to.</span></div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="pic"><img src="${P}worn-1.jpg" alt="A shawl worn outdoors" loading="lazy"></div>
-    <div class="txt">
-      <span class="eyebrow">Built to open standards</span>
-      <h2>A passport before it becomes a requirement.</h2>
-      <p>The EU is bringing in a Digital Product Passport for textiles over the next few years. Ours already carries a permanent identifier and can be read by a machine as well as a person.</p>
-      <p>We made it so you could meet the spinner. The paperwork comes with it.</p>
-    </div>
-  </section>
+  <div class="facts bleed gap-s">
+    <div><b>Stitched</b><span class="small">Under the hem label. Never glued, never pressed.</span></div>
+    <div><b>One of one</b><span class="small">Each tag is unique, and cannot be copied to another piece.</span></div>
+    <div><b>No app</b><span class="small">It opens in the browser, for you or anyone you show.</span></div>
+    <div><b>Open</b><span class="small">Built to the standard Europe is adopting for textiles.</span></div>
+  </div>
 `);
 
 /* ───────── CONTACT ───────── */
-page('contact.html', 'Contact — KHADDI', 'Write to the hub in Basohli or to the Discovering Roots Trust.', `
-  <section class="contact">
-    <div class="box">
-      <span class="eyebrow">Write to us</span>
-      <h1>A person in Basohli reads every message.</h1>
-      <p style="color:var(--ink-soft)">We reply within two working days. For a Nāma proof or an order question, include the piece number.</p>
-      <form class="form">
-        <label for="c1">Name</label><input id="c1" class="field" style="background:var(--undyed)">
-        <label for="c2">Email</label><input id="c2" class="field" type="email" style="background:var(--undyed)">
-        <label for="c3">Piece number, if you have one</label><input id="c3" class="field" style="background:var(--undyed)" placeholder="0187">
-        <label for="c4">Message</label><textarea id="c4" class="field" rows="5" style="background:var(--undyed)"></textarea>
-        <button class="btn btn-madder" type="button" style="justify-self:start">Send</button>
-      </form>
-    </div>
-    <div class="box lapis">
-      <span class="eyebrow">Where we are</span>
-      <h1>The hub, the trust, and the press desk.</h1>
-      <dl>
-        <div><dt>The hub</dt><dd>Basohli, Kathua district, Jammu &amp; Kashmir, India</dd></div>
-        <div><dt>Orders and care</dt><dd>hello@khaddipashmina.com</dd></div>
-        <div><dt>The trust</dt><dd>discoveringroots.org</dd></div>
-        <div><dt>Press and institutions</dt><dd>press@discoveringroots.org</dd></div>
-        <div><dt>Wholesale</dt><dd>Opens January 2027</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <section class="section" style="padding-bottom:0">
-    <h2 class="section-title">Before you write</h2>
-    <div class="faq">
-      <details class="acc"><summary>When will my order arrive?</summary><div class="in">In-stock pieces ship in 48 hours and take about seven days to the EU. The date is shown before you pay.</div></details>
-      <details class="acc"><summary>Can I visit the hub?</summary><div class="in">Yes, by arrangement. Write to us with your dates.</div></details>
-      <details class="acc"><summary>Do you discount?</summary><div class="in">No. The price is what the work costs, and the makers are paid before anyone else.</div></details>
-      <details class="acc"><summary>Can you repair a piece?</summary><div class="in">Yes. Book through the Thread Passport and it goes back to the person who made it.</div></details>
-    </div>
+page('contact.html', 'Contact — KHADDI PASHMINA', 'Write to the hub in Basohli or to the Discovering Roots Trust.', `
+  <div class="page-head">
+    <p class="label soft">Contact</p>
+    <h1 class="display">A person in Basohli <em>reads every letter.</em></h1>
+  </div>
+  <section class="duo" style="align-items:start">
+    <dl class="spec">
+      <div><dt>Orders and care</dt><dd>hello@khaddipashmina.com</dd></div>
+      <div><dt>The hub</dt><dd>Basohli, Kathua district, Jammu, India</dd></div>
+      <div><dt>The trust</dt><dd>discoveringroots.org</dd></div>
+      <div><dt>Press</dt><dd>press@discoveringroots.org</dd></div>
+      <div><dt>Visits</dt><dd>By arrangement. Write with your dates.</dd></div>
+    </dl>
+    <form class="form" style="margin-top:-22px">
+      <label class="label" for="c1">Name</label><input id="c1" class="field">
+      <label class="label" for="c2">Email</label><input id="c2" class="field" type="email">
+      <label class="label" for="c3">Order or piece number, if you have one</label><input id="c3" class="field" placeholder="0187">
+      <label class="label" for="c4">Message</label><textarea id="c4" class="field" rows="4"></textarea>
+      <button class="btn solid" type="button" style="margin-top:34px">Send</button>
+      <p class="note" style="margin-top:12px">We reply within two working days.</p>
+    </form>
   </section>
 `);
 
-console.log('built 8 pages');
+console.log('built 9 pages');
